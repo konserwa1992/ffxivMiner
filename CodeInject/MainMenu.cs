@@ -103,22 +103,14 @@ namespace CodeInject
             return *firstObjectsElement;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            MessageBox.Show(sizeof(int).ToString("X"));
-        }
 
         private void button1_Click_2(object sender, EventArgs e)
         {
           //  MessageBox.Show(Marshal.PtrToStringAnsi(new IntPtr(MonsterAdr(lNearObjects.SelectedIndex) + 0x30)));
-            ActiveObject delegateRecive = (ActiveObject)Marshal.GetDelegateForFunctionPointer(new IntPtr((long)(GetBaseAdress() + 0x425A70)), typeof(ActiveObject));
+            ActiveObject activeObject = (ActiveObject)Marshal.GetDelegateForFunctionPointer(new IntPtr((long)(GetBaseAdress() + 0x425A70)), typeof(ActiveObject));
             int* thisADDR = (int*)(GetBaseAdress() + 0x1804134);
             if (lNearObjects.SelectedIndex != -1)
-                delegateRecive(new IntPtr(*thisADDR).ToPointer(), new IntPtr(MonsterAdr(lNearObjects.SelectedIndex)).ToPointer());
+                activeObject(new IntPtr(*thisADDR).ToPointer(), new IntPtr(MonsterAdr(lNearObjects.SelectedIndex)).ToPointer());
 
         }
 
