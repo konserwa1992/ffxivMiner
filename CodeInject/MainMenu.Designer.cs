@@ -32,16 +32,19 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.lNearObjects = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.lObjectCount = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // timer1
             // 
+            this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
@@ -51,19 +54,29 @@
             this.lNearObjects.ItemHeight = 15;
             this.lNearObjects.Location = new System.Drawing.Point(6, 22);
             this.lNearObjects.Name = "lNearObjects";
-            this.lNearObjects.Size = new System.Drawing.Size(189, 214);
+            this.lNearObjects.Size = new System.Drawing.Size(210, 214);
             this.lNearObjects.TabIndex = 0;
+            this.lNearObjects.SelectedIndexChanged += new System.EventHandler(this.lNearObjects_SelectedIndexChanged);
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.lObjectCount);
             this.groupBox1.Controls.Add(this.lNearObjects);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(201, 264);
+            this.groupBox1.Size = new System.Drawing.Size(543, 264);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Near by objects";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(437, 22);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 23);
+            this.textBox1.TabIndex = 6;
             // 
             // lObjectCount
             // 
@@ -77,7 +90,7 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::CodeInject.Properties.Resources.maxresdefault;
-            this.pictureBox1.Location = new System.Drawing.Point(219, 23);
+            this.pictureBox1.Location = new System.Drawing.Point(286, 282);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(426, 243);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -103,6 +116,15 @@
             this.button2.Text = "Refresh";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(240, 52);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(36, 15);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "label1";
             // 
             // MainMenu
             // 
@@ -133,5 +155,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label1;
     }
 }

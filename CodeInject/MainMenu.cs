@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using System.Windows.Forms;
 
 namespace CodeInject
 {
+
+
     public unsafe partial class MainMenu : Form
     {
         #region externals
@@ -40,6 +43,22 @@ namespace CodeInject
         public static extern void GetByteArray(UInt64 adress, byte[] outTable, int size);
         #endregion
 
+        public class Actor
+        {
+            public int Id; // 0x74
+            public string Name;
+            public int Addres;
+            public float* PosX;
+            public float* PosY;
+            public float* PosZ;
+
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+
+        public List<Actor> ActorList { get; set; } = new List<Actor>();
 
 
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
@@ -49,6 +68,8 @@ namespace CodeInject
         unsafe delegate void CallAction(void* argThis, int arg0, int actionID, uint targetID, int arg3, int arg4, int arg5, int arg6, int arg7);
 
 
+
+        //////////research [[ffxiv.exe+18070C0]+14]+c58//////
 
         /// <summary>
         /// MonsterAdr() + 0x74 to adress targetu 
@@ -73,12 +94,14 @@ namespace CodeInject
             InitializeComponent();
 
 
-            objectCount = (int*)(new IntPtr((long)(GetBaseAdress() + 0x18051D4)).ToPointer());
+            objectCount = (int*)(new IntPtr(GetInt32((GetBaseAdress() + 0x180D1B4))+0xEB4).ToPointer());
+            MessageBox.Show((*objectCount).ToString());
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            lNearObjects.Items.Clear();
+           /* lNearObjects.Items.Clear();
+            ActorList.Clear();
 
             int* firstObjectsElement = objectCount;
             lObjectCount.Text = $"Count: {*objectCount}";
@@ -86,9 +109,20 @@ namespace CodeInject
 
             for (int i = 0;i<*objectCount; i++)
             {
-                string str = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement+0x30));
-                lNearObjects.Items.Add((str));
+                Actor actor = new Actor
+                {
+                    Name = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement + 0x30)),
+                    Addres = (*firstObjectsElement),
+                    Id = (*(firstObjectsElement + 0x74))
+                };
+                ActorList.Add(actor);
+
                 firstObjectsElement++;
+            }*/
+
+            if(lNearObjects.SelectedIndex!=-1)
+            {
+                label1.Text = $"POS: x:{*((Actor)lNearObjects.SelectedItem).PosX} y:{*((Actor)lNearObjects.SelectedItem).PosY} z:{*((Actor)lNearObjects.SelectedItem).PosZ}";
             }
         }
 
@@ -104,20 +138,9 @@ namespace CodeInject
         }
 
 
-        private void button1_Click_2(object sender, EventArgs e)
+        public void resetList()
         {
-          //  MessageBox.Show(Marshal.PtrToStringAnsi(new IntPtr(MonsterAdr(lNearObjects.SelectedIndex) + 0x30)));
-            ActiveObject activeObject = (ActiveObject)Marshal.GetDelegateForFunctionPointer(new IntPtr((long)(GetBaseAdress() + 0x425A70)), typeof(ActiveObject));
-            int* thisADDR = (int*)(GetBaseAdress() + 0x1804134);
-            if (lNearObjects.SelectedIndex != -1)
-                activeObject(new IntPtr(*thisADDR).ToPointer(), new IntPtr(MonsterAdr(lNearObjects.SelectedIndex)).ToPointer());
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-            lNearObjects.Items.Clear();
+            ActorList.Clear();
 
             int* firstObjectsElement = objectCount;
             lObjectCount.Text = $"Count: {*objectCount}";
@@ -125,12 +148,68 @@ namespace CodeInject
 
             for (int i = 0; i < *objectCount; i++)
             {
-                string str = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement + 0x30));
-                lNearObjects.Items.Add((str));
+                Actor actor = new Actor
+                {
+                    Name = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement + 0x30)),
+                    Addres = (*firstObjectsElement),
+                    Id = (*(firstObjectsElement + 0x74)),
+                    PosX = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x80).ToPointer(),
+                    PosZ = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x84).ToPointer(),
+                    PosY = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x88).ToPointer()
+                };
+                ActorList.Add(actor);
                 firstObjectsElement++;
             }
         }
 
+        private void button1_Click_2(object sender, EventArgs e)
+        {
+            resetList();
+            ActiveObject activeObject = (ActiveObject)Marshal.GetDelegateForFunctionPointer(new IntPtr((long)(GetBaseAdress() + 0x425a70)), typeof(ActiveObject));
+            int* thisADDR = (int*)(GetBaseAdress() + 0x180D1B4);
+            if (lNearObjects.SelectedIndex != -1 && *thisADDR != 0x0)
+            {
+                int selectObjectIndex = ActorList.FindIndex(x => ((Actor)lNearObjects.SelectedItem).Addres == x.Addres);
+                if (selectObjectIndex != -1)
+                {
+                    Actor player = ActorList[0];
+                    *player.PosX = *((Actor)lNearObjects.SelectedItem).PosX;
+                    *player.PosY = *((Actor)lNearObjects.SelectedItem).PosY;
+                    *player.PosZ = *((Actor)lNearObjects.SelectedItem).PosZ;
+                    activeObject(new IntPtr(*thisADDR).ToPointer(), new IntPtr(MonsterAdr(selectObjectIndex)).ToPointer());
+                }
+            }
+        }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            lNearObjects.Items.Clear();
+            ActorList.Clear();
+
+            int* firstObjectsElement = objectCount;
+            lObjectCount.Text = $"Count: {*objectCount}";
+            firstObjectsElement++;
+
+            for (int i = 0; i < *objectCount; i++)
+            {
+                Actor actor = new Actor
+                {
+                    Name = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement + 0x30)),
+                    Addres = (*firstObjectsElement),
+                    Id = (*(firstObjectsElement + 0x74)),
+                    PosX = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x80).ToPointer(),
+                    PosZ = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x84).ToPointer(),
+                    PosY = (float*)new IntPtr(*firstObjectsElement + 0x30 + 0x88).ToPointer()
+                };
+                ActorList.Add(actor);
+                lNearObjects.Items.Add(actor);
+                firstObjectsElement++;
+            }
+        }
+
+        private void lNearObjects_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
