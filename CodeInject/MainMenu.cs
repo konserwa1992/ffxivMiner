@@ -67,12 +67,8 @@ namespace CodeInject
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         unsafe delegate void CallAction(void* argThis, int arg0, int actionID, uint targetID, int arg3, int arg4, int arg5, int arg6, int arg7);
 
-
-
-        //////////research [[ffxiv.exe+18070C0]+14]+c58//////
-
         /// <summary>
-        /// MonsterAdr() + 0x74 to adress targetu 
+        /// MonsterAdr() + 0x74 targetID address
         /// </summary>
         /// <param name="actionId"></param>
         /// <param name="targetID"></param>
@@ -81,10 +77,6 @@ namespace CodeInject
             CallAction delegateRecive = (CallAction)Marshal.GetDelegateForFunctionPointer(new IntPtr((long)(GetBaseAdress() + 0x8055C0)), typeof(CallAction));
             delegateRecive((new IntPtr((long)(GetBaseAdress() + 0x16C3DD0)).ToPointer()), 1, actionId, targetID,0, 0, 0, 0, 0);
         }
-
-        /// <summary>
-        /// 00001D6D
-        /// </summary>
 
         int* objectCount;
 
@@ -100,26 +92,6 @@ namespace CodeInject
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-           /* lNearObjects.Items.Clear();
-            ActorList.Clear();
-
-            int* firstObjectsElement = objectCount;
-            lObjectCount.Text = $"Count: {*objectCount}";
-            firstObjectsElement++;
-
-            for (int i = 0;i<*objectCount; i++)
-            {
-                Actor actor = new Actor
-                {
-                    Name = Marshal.PtrToStringAnsi(new IntPtr(*firstObjectsElement + 0x30)),
-                    Addres = (*firstObjectsElement),
-                    Id = (*(firstObjectsElement + 0x74))
-                };
-                ActorList.Add(actor);
-
-                firstObjectsElement++;
-            }*/
-
             if(lNearObjects.SelectedIndex!=-1)
             {
                 label1.Text = $"POS: x:{*((Actor)lNearObjects.SelectedItem).PosX} y:{*((Actor)lNearObjects.SelectedItem).PosY} z:{*((Actor)lNearObjects.SelectedItem).PosZ}";
